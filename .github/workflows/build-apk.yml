@@ -1,0 +1,33 @@
+
+name: Build PelajarKu APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract project
+        run: unzip pelajarku-android-source.zip
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Build APK
+        working-directory: pelajarku-mobile
+        run: |
+          flutter create --platforms=android --org id.pelajarku .
+          flutter pub get
+          flutter build apk --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pelajarku-release-apk
+          path: pelajarku-mobile/build/app/outputs/flutter-apk/app-release.apk
+          
